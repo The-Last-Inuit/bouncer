@@ -1,0 +1,7 @@
+[package]
+name = "bouncer"
+version = "0.1.0"
+authors = ["thelastinuit <email@luisignac.io>"]
+edition = "2018"
+
+[dependencies]
