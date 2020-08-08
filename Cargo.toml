@@ -1,7 +1,22 @@
 [package]
 name = "bouncer"
 version = "0.1.0"
-authors = ["thelastinuit <email@luisignac.io>"]
+authors = ["louise <email@luisignac.io>"]
 edition = "2018"
 
 [dependencies]
+clippy  = { "version" = "0.0.21", optional = true }
+config  = { "version" = "0.9" }
+futures = { "version" = "0.3.5",  default-features = false }
+redis   = { "version" = "0.16.0" }
+serde   = { "version" = "1.0.114", features = ["derive"] }
+serde_json = { "version" = "1.0" }
+tokio   = { "version" = "0.2.21", features = ["full"] }
+
+[dev-dependencies]
+api     = { "version" = "0.2.0" }
+curl    = { "version" = "0.4.31" }
+
+[features]
+default = []
+dev = ["clippy"]
