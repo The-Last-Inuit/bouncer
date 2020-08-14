@@ -4,6 +4,16 @@
 
 Bouncer helps you to manage your requests to third-party services.
 
+#### Setup
+
+In order to use Bouncer, you need Redis as a backend. Then you can configure Redis URI:
+
+```
+#config/default.toml
+
+server_url="redis://redis/"
+```
+
 #### Usage
 
 Imagine you have a function that makes a request to a services.
@@ -20,8 +30,8 @@ fn dummy_function() {
 }
 ```
 
-You can use bouncer to call that function many times in many place i.e. asynch jobs and let bouncer handle
-the request.
+You can use bouncer to call that function many times in many place i.e. asynch jobs and 
+let bouncer handle the request.
 
 ```rust
 bouncer::run(KEY, RATE_LIMIT, WAIT_TIME, &dummy_function)

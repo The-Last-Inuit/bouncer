@@ -15,11 +15,36 @@ fn dummy_function() {
 
 #[test]
 fn it_should_run() {
+    use bouncer::Bouncer;
     thread::spawn(|| {
-        assert_eq!(bouncer::run(1, 2, 3, &dummy_function).is_ok(), true);
+        assert_eq!(
+            Bouncer::new(&dummy_function)
+                .key(1)
+                .rate_limit(2)
+                .wait_time(3)
+                .run()
+                .is_ok(),
+            true
+        );
     });
     thread::spawn(|| {
-        assert_eq!(bouncer::run(2, 3, 5, &dummy_function).is_ok(), true);
+        assert_eq!(
+            Bouncer::new(&dummy_function)
+                .key(2)
+                .rate_limit(3)
+                .wait_time(5)
+                .run()
+                .is_ok(),
+            true
+        );
     });
-    assert_eq!(bouncer::run(0, 5, 1, &dummy_function).is_ok(), true);
+    assert_eq!(
+        Bouncer::new(&dummy_function)
+            .key(0)
+            .rate_limit(5)
+            .wait_time(1)
+            .run()
+            .is_ok(),
+        true
+    );
 }
