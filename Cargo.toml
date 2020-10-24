@@ -1,8 +1,13 @@
 [package]
 name = "bouncer"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["louise <email@luisignac.io>"]
 edition = "2018"
+license = "MIT"
+description = "Bouncer allows you handle your requests to third-party services with no worries, perhaps some worries."
+documentation = "https://github.com/thelastinuit/bouncer"
+homepage = "https://github.com/thelastinuit/Bouncer" 
+repository = "https://github.com/thelastinuit/bouncer.git"
 
 [dependencies]
 clippy  = { "version" = "0.0.21", optional = true }
