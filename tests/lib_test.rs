@@ -1,50 +1,44 @@
-use curl::easy::Easy;
-use std::io::{stdout, Write};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use std::thread;
 
+static CALL_COUNT: AtomicUsize = AtomicUsize::new(0);
+
 fn dummy_function() {
-    let mut easy = Easy::new();
-    easy.url("http://httpbin.org/delay/3").unwrap();
-    easy.write_function(|data| {
-        stdout().write_all(data).unwrap();
-        Ok(data.len())
-    })
-    .unwrap();
-    easy.perform().unwrap();
+    CALL_COUNT.fetch_add(1, Ordering::SeqCst);
 }
 
 #[test]
 fn it_should_run() {
-    use bouncer::Bouncer;
-    thread::spawn(|| {
-        assert_eq!(
-            Bouncer::new(&dummy_function)
-                .key(1)
-                .rate_limit(2)
-                .wait_time(3)
-                .run()
-                .is_ok(),
-            true
-        );
-    });
-    thread::spawn(|| {
-        assert_eq!(
-            Bouncer::new(&dummy_function)
-                .key(2)
-                .rate_limit(3)
-                .wait_time(5)
-                .run()
-                .is_ok(),
-            true
-        );
-    });
-    assert_eq!(
-        Bouncer::new(&dummy_function)
-            .key(0)
-            .rate_limit(5)
-            .wait_time(1)
-            .run()
-            .is_ok(),
-        true
-    );
+    use bouncer::{Bouncer, BouncerConfig};
+
+    CALL_COUNT.store(0, Ordering::SeqCst);
+
+    let config = Arc::new(BouncerConfig::default());
+    let cases = [
+        ("key-1", 2u8, 3u8),
+        ("key-2", 3u8, 5u8),
+        ("key-0", 5u8, 1u8),
+    ];
+    let mut handles = Vec::new();
+
+    for (key, rate_limit, wait_time) in cases.iter().copied() {
+        let config = Arc::clone(&config);
+        handles.push(thread::spawn(move || {
+            assert!(
+                Bouncer::new(&dummy_function)
+                    .key(key)
+                    .rate_limit(rate_limit)
+                    .wait_time(wait_time)
+                    .run_with(config.as_ref())
+                    .is_ok()
+            );
+        }));
+    }
+
+    for handle in handles {
+        handle.join().expect("thread join");
+    }
+
+    assert_eq!(CALL_COUNT.load(Ordering::SeqCst), cases.len());
 }

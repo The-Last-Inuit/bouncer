@@ -1,3 +1,0 @@
-[redis]
-server_url = "redis://127.0.0.1/"
-script = "src/script.lua"
